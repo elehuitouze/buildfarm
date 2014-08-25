@@ -105,7 +105,7 @@ if (manager.logContains(".*hudson.plugins.git.GitException: Could not clone.*"))
       <setForMatrix>false</setForMatrix>
     </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
     <hudson.tasks.Mailer>
-      <recipients>ros-buildfarm-release@@googlegroups.com @(NOTIFICATION_EMAIL)</recipients>
+      <recipients>@(NOTIFICATION_EMAIL)</recipients>
       <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
       <sendToIndividuals>false</sendToIndividuals>
     </hudson.tasks.Mailer>

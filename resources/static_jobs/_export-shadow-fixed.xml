@@ -39,7 +39,7 @@ ssh rosbuild@repos.ros.org -- bash /home/rosbuild/push_keys/push_fixed.bash</com
   </builders>
   <publishers>
     <hudson.tasks.Mailer plugin="mailer@1.8">
-      <recipients>ros-buildfarm-release@googlegroups.com </recipients>
+      <recipients> </recipients>
       <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
       <sendToIndividuals>false</sendToIndividuals>
     </hudson.tasks.Mailer>
