@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Trigger devel jobs for Groovy.&#xd;
+  <description>Reconfigure doc jobs for Jade.&#xd;
 &#xd;
 Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in the repository.</description>
   <logRotator class="hudson.tasks.LogRotator">
@@ -14,7 +14,7 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
   <properties>
     <jenkins.advancedqueue.AdvancedQueueSorterJobProperty plugin="PrioritySorter@2.6">
       <useJobPriority>true</useJobPriority>
-      <priority>860</priority>
+      <priority>840</priority>
     </jenkins.advancedqueue.AdvancedQueueSorterJobProperty>
   </properties>
   <scm class="hudson.scm.NullSCM"/>
@@ -23,27 +23,16 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers/>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>22 22 * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.groovy.SystemGroovy plugin="groovy@1.15">
-      <scriptSource class="hudson.plugins.groovy.StringScriptSource">
-        <command>import java.util.regex.Matcher
-import java.util.regex.Pattern
-import hudson.model.AbstractProject
-import hudson.model.Result
-
-pattern = Pattern.compile("devel-groovy-.+")
-for (p in hudson.model.Hudson.instance.getAllItems(AbstractProject)) {
-	if (!pattern.matcher(p.name).matches()) continue
-	if (p.isBuilding() || p.isInQueue()) continue
-	println p.name
-	p.scheduleBuild()
-}</command>
-      </scriptSource>
-      <bindings/>
-      <classpath/>
-    </hudson.plugins.groovy.SystemGroovy>
+    <hudson.tasks.Shell>
+      <command>generate_jenkins_doc jade --delete</command>
+    </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.tasks.Mailer plugin="mailer@1.8">

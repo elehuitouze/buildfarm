@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Trigger jobs with missing Debian packages for Groovy.&#xd;
+  <description>Generate status page for Jade.&#xd;
 &#xd;
 Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in the repository.</description>
   <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>180</daysToKeep>
-    <numToKeep>30</numToKeep>
+    <numToKeep>100</numToKeep>
     <artifactDaysToKeep>-1</artifactDaysToKeep>
     <artifactNumToKeep>-1</artifactNumToKeep>
   </logRotator>
@@ -14,16 +14,14 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
   <properties>
     <jenkins.advancedqueue.AdvancedQueueSorterJobProperty plugin="PrioritySorter@2.6">
       <useJobPriority>true</useJobPriority>
-      <priority>858</priority>
+      <priority>800</priority>
     </jenkins.advancedqueue.AdvancedQueueSorterJobProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@2.0.4">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <name/>
-        <refspec/>
-        <url>https://github.com/ros-infrastructure/buildfarm.git</url>
+        <url>git://github.com/ros-infrastructure/buildfarm.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -32,26 +30,38 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
-    <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <extensions>
-      <hudson.plugins.git.extensions.impl.PerBuildTag />
+      <hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
+        <relativeTargetDir>monitored_vcs</relativeTargetDir>
+      </hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
     </extensions>
   </scm>
-  <assignedNode>master</assignedNode>
+  <assignedNode>debbuild</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
-  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers/>
+  <blockBuildWhenUpstreamBuilding>true</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>*/15 * * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>#!/bin/bash
+      <command>#!/bin/bash -x
 
-ls
-source ./setup.sh
-./scripts/trigger_missing.py groovy --commit</command>
+#stop on error
+set -o errexit
+
+export PYTHONPATH=$WORKSPACE/monitored_vcs
+
+$WORKSPACE/monitored_vcs/scripts/generate_status_page.py jade --basedir $WORKSPACE/jade_apt_cache
+scp -o StrictHostKeyChecking=no -r $WORKSPACE/jade_apt_cache/jade.* $WORKSPACE/monitored_vcs/resources/css $WORKSPACE/monitored_vcs/resources/js rosbot@ros.osuosl.org:/var/www/www.ros.org/debbuild/
+
+$WORKSPACE/monitored_vcs/scripts/generate_status_page.py jade --basedir $WORKSPACE/jade_mirror_apt_cache --resources .. --shadow-repo http://packages.ros.org/ros-shadow-fixed/ubuntu/ --public-repo http://packages.ros.org/ros/ubuntu/
+scp -o StrictHostKeyChecking=no $WORKSPACE/jade_mirror_apt_cache/jade.* rosbot@ros.osuosl.org:/var/www/www.ros.org/debbuild/mirror/</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

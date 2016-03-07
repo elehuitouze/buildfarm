@@ -17,7 +17,7 @@ base=/var/cache/pbuilder-$distro-$arch
 aptconffile=$WORKSPACE/apt.conf
 
 #increment this value if you have changed something that will invalidate base tarballs. #TODO this will need cleanup eventually.
-basetgz_version=8
+basetgz_version=10
 
 rootdir=$base/apt-conf-$basetgz_version
 
@@ -34,7 +34,8 @@ then
 else
     debootstrap_type='debootstrap'
     # Support for EOLd distros
-    if [ $distro == oneiric ] || [ $distro == quantal ] || [ $distro == raring ]
+    # OLD_UBUNTU_DISTROS
+    if [ $distro == oneiric ] || [ $distro == quantal ] || [ $distro == raring ] || [ $distro == saucy ] || [ $distro == utopic ]
     then
         mirror=http://old-releases.ubuntu.com/ubuntu
     else
@@ -83,7 +84,7 @@ echo "package name ${PACKAGE} version ${version}"
 
 
 # Setup the pbuilder environment if not existing, or update
-if [ ! -e $basetgz ] || [ ! -s $basetgz ] 
+if [ ! -e $basetgz ] || [ ! -s $basetgz ]
 then
   #make sure the base dir exists
   sudo mkdir -p $base

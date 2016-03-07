@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Generate status page for Groovy.&#xd;
+  <description>Trigger sourcedeb jobs with missing Debian packages for Jade.&#xd;
 &#xd;
 Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in the repository.</description>
   <logRotator class="hudson.tasks.LogRotator">
@@ -14,14 +14,16 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
   <properties>
     <jenkins.advancedqueue.AdvancedQueueSorterJobProperty plugin="PrioritySorter@2.6">
       <useJobPriority>true</useJobPriority>
-      <priority>800</priority>
+      <priority>854</priority>
     </jenkins.advancedqueue.AdvancedQueueSorterJobProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@2.0.4">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>git://github.com/ros-infrastructure/buildfarm.git</url>
+        <name/>
+        <refspec/>
+        <url>https://github.com/ros-infrastructure/buildfarm.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -30,18 +32,17 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <extensions>
-      <hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
-        <relativeTargetDir>monitored_vcs</relativeTargetDir>
-      </hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
+      <hudson.plugins.git.extensions.impl.PerBuildTag />
     </extensions>
   </scm>
-  <assignedNode>debbuild</assignedNode>
+  <assignedNode>master</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
-  <blockBuildWhenUpstreamBuilding>true</blockBuildWhenUpstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers>
     <hudson.triggers.TimerTrigger>
       <spec>*/15 * * * *</spec>
@@ -50,18 +51,11 @@ Generated from buildfarm/resources/static_jobs. Do not edit on Jenkins but in th
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>#!/bin/bash -x
+      <command>#!/bin/bash
 
-#stop on error
-set -o errexit
-
-export PYTHONPATH=$WORKSPACE/monitored_vcs
-
-$WORKSPACE/monitored_vcs/scripts/generate_status_page.py groovy --basedir $WORKSPACE/groovy_apt_cache
-scp -o StrictHostKeyChecking=no -r $WORKSPACE/groovy_apt_cache/groovy.* $WORKSPACE/monitored_vcs/resources/css $WORKSPACE/monitored_vcs/resources/js rosbot@ros.osuosl.org:/var/www/www.ros.org/debbuild/
-
-$WORKSPACE/monitored_vcs/scripts/generate_status_page.py groovy --basedir $WORKSPACE/groovy_mirror_apt_cache --resources .. --shadow-repo http://packages.ros.org/ros-shadow-fixed/ubuntu/ --public-repo http://packages.ros.org/ros/ubuntu/
-scp -o StrictHostKeyChecking=no $WORKSPACE/groovy_mirror_apt_cache/groovy.* rosbot@ros.osuosl.org:/var/www/www.ros.org/debbuild/mirror/</command>
+ls
+source ./setup.sh
+./scripts/trigger_missing.py jade --sourcedeb-only --commit</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
