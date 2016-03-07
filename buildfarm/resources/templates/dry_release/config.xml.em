@@ -17,7 +17,7 @@
       <hudson.plugins.git.UserRemoteConfig>
         <name/>
         <refspec/>
-        <url>git://github.com/ros-infrastructure/buildfarm.git</url>
+        <url>git://github.com/elehuitouze/buildfarm.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
